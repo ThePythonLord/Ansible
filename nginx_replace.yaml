@@ -1,27 +1,29 @@
 ---
-- name: Deploy Nginx Configuration
+- name: Update Nginx Configuration
   hosts: all
   become: yes
   become_user: root
   tasks:
-    - name: Ensure Nginx configuration directory exists
-      file:
-        path: /etc/nginx
-        state: directory
-        mode: '0755'
+    - name: Stop Nginx
+      systemd:
+        name: nginx
+        state: stopped
+      ignore_errors: yes
 
-    - name: Copy Nginx configuration file
+    - name: Remove old Nginx configuration file
+      file:
+        path: /etc/nginx/nginx.conf
+        state: absent
+
+    - name: Copy new Nginx configuration file
       template:
-        src: nginx.conf.j2
+        src: nginx.conf.j2  # Adjust this to your template path
         dest: /etc/nginx/nginx.conf
         owner: root
         group: root
         mode: '0644'
-      notify:
-        - Reload Nginx
 
-  handlers:
-    - name: Reload Nginx
+    - name: Start Nginx
       systemd:
         name: nginx
-        state: restarted
+        state: started
