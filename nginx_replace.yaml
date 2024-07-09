@@ -1,6 +1,6 @@
 ---
 - name: Deploy Nginx Configuration
-  hosts: nginx_servers
+  hosts: all
   become: yes
   become_user: root
   tasks:
