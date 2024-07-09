@@ -3,12 +3,11 @@
   hosts: all
   become: yes
   tasks:
-    - name: Wait for apt to be available
-      wait_for:
-        path: /var/lib/apt/lists/lock
-        state: absent
-        timeout: 300  # Adjust timeout as needed (in seconds)
-        
-    - name: Update apt package cache
-      apt:
-        update_cache: yes
+    - name: update apt list
+    apt:
+      update_cache: yes
+    - name: packages | ensure apt list dir exists
+  file:
+    path: /var/lib/apt/lists/
+    state: directory
+    mode: 0755
