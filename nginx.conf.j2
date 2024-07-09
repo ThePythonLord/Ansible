@@ -1,83 +1,37 @@
 user www-data;
 worker_processes auto;
 pid /run/nginx.pid;
-include /etc/nginx/modules-enabled/*.conf;
 
 events {
     worker_connections 768;
-    # multi_accept on;
 }
 
 http {
-    ##
-    # Basic Settings
-    ##
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+
+    access_log /var/log/nginx/access.log;
+    error_log /var/log/nginx/error.log;
+
     sendfile on;
     tcp_nopush on;
     tcp_nodelay on;
     keepalive_timeout 65;
-    types_hash_max_size 2048;
 
-    ##
-    # Logging Settings
-    ##
-    access_log /var/log/nginx/access.log;
-    error_log /var/log/nginx/error.log;
-
-    ##
-    # Gzip Settings
-    ##
     gzip on;
-    gzip_disable "msie6";
-    gzip_vary on;
-    gzip_proxied any;
-    gzip_comp_level 6;
-    gzip_buffers 16 8k;
-    gzip_http_version 1.1;
-    gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
 
-    ##
-    # Virtual Host Configs
-    ##
-    include /etc/nginx/conf.d/*.conf;
-    include /etc/nginx/sites-enabled/*;
-
-    ##
-    # Additional Settings
-    ##
-
-    # Set client body size limit to 100M (adjust as needed)
-    client_max_body_size 100M;
-
-    # Set timeouts for proxying to upstream servers
-    proxy_connect_timeout       300;
-    proxy_send_timeout          300;
-    proxy_read_timeout          300;
-    send_timeout                300;
-
-    # Configure server names hash bucket size
-    server_names_hash_bucket_size 128;
-
-    # Enable SSL session cache
-    ssl_session_cache shared:SSL:10m;
-    ssl_session_timeout 10m;
-
-    ##
-    # Server Configurations
-    ##
-    
     server {
-        listen 8000;
-        server_name example.com;
-        
+        listen 8080;  # Set the listening port to 8080
+        server_name localhost;  # Adjust server_name as needed
+
         location / {
-            # Configuration for your web application
-            # Example: proxy_pass http://localhost:8080;
-            # Ensure to adjust this according to your application setup
-            root /path/to/your/website;
+            root /var/www/html;  # Adjust root directory as needed
             index index.html index.htm;
         }
-        
-        # Include additional server configuration directives here
+
+        # Additional server configurations can be added here
     }
+
+    include /etc/nginx/conf.d/*.conf;
+    include /etc/nginx/sites-enabled/*;
 }
