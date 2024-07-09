@@ -7,7 +7,7 @@
       file:
         path: /etc/nginx
         state: directory
-        mode: 0755
+        mode: '0755'
 
     - name: Copy Nginx configuration file
       template:
@@ -15,12 +15,12 @@
         dest: /etc/nginx/nginx.conf
         owner: root
         group: root
-        mode: 0644
+        mode: '0644'
       notify:
         - Reload Nginx
 
-handlers:
-  - name: Reload Nginx
-    systemd:
-      name: nginx
-      state: restarted
+  handlers:
+    - name: Reload Nginx
+      systemd:
+        name: nginx
+        state: restarted
