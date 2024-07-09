@@ -1,9 +1,14 @@
 ---
-- hosts: all
-
-  become: true
+- name: Update apt packages
+  hosts: all
+  become: yes
   tasks:
-    - name: update apt packages
+    - name: Wait for apt to be available
+      wait_for:
+        path: /var/lib/apt/lists/lock
+        state: absent
+        timeout: 300  # Adjust timeout as needed (in seconds)
+        
+    - name: Update apt package cache
       apt:
-        upgrade: yes
         update_cache: yes
