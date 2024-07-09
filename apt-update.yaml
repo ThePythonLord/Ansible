@@ -4,12 +4,6 @@
   become: yes
   become_user: root
   tasks:
-    - name: Ensure apt lists directory exists
-      file:
-        path: /var/lib/apt/lists
-        state: directory
-        mode: '0755'
-
     - name: Update apt package cache
       apt:
         update_cache: yes
