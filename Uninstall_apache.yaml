@@ -1,0 +1,32 @@
+---
+- name: Remove Apache from all nodes
+  hosts: all
+  become: yes
+  tasks:
+    - name: Stop Apache service
+      service:
+        name: apache2
+        state: stopped
+        enabled: no
+
+    - name: Remove Apache packages
+      apt:
+        name: "{{ item }}"
+        state: absent
+      loop:
+        - apache2
+        - apache2-utils
+        - apache2-bin
+        - apache2-data
+
+    - name: Ensure Apache configuration directory is absent
+      file:
+        path: /etc/apache2
+        state: absent
+      notify: restart nginx
+
+  handlers:
+    - name: restart nginx
+      systemd:
+        name: nginx
+        state: restarted
