@@ -1,14 +1,20 @@
 ---
-- name: Update apt packages and ensure apt list directory exists
+- name: Update apt packages, ensure apt lists directory exists, and upgrade packages
   hosts: all
   become: yes
   tasks:
-    - name: Update apt package cache
-      apt:
-        update_cache: yes
-
     - name: Ensure apt lists directory exists
       file:
         path: /var/lib/apt/lists
         state: directory
         mode: '0755'
+
+    - name: Update apt package cache
+      apt:
+        update_cache: yes
+
+    - name: Upgrade all packages
+      apt:
+        upgrade: yes
+        autoremove: yes
+        autoclean: yes
