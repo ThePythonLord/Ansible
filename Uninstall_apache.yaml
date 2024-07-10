@@ -1,7 +1,8 @@
 ---
 - name: Uninstall Apache2 from Ubuntu
-  hosts: your_host_group
+  hosts: all
   become: yes
+  become_user: root
   tasks:
     - name: Stop Apache2 service
       service:
