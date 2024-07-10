@@ -6,7 +6,7 @@
   tasks:
     - name: Copy index.html to /var/www/html
       copy:
-        src: /path/to/your/local/index.html  # Adjust this to the local path of the HTML file
+        src: index.html  # Adjust this to the local path of the HTML file
         dest: /var/www/html/index.html
         owner: www-data
         group: www-data
