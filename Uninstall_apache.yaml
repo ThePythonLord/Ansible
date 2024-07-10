@@ -5,12 +5,12 @@
   become_user: root
   tasks:
     - name: Stop Apache2 service
-      service:
+      systemd:
         name: apache2
         state: stopped
 
     - name: Disable Apache2 service
-      service:
+      systemd:
         name: apache2
         enabled: no
 
@@ -24,16 +24,19 @@
       file:
         path: /etc/apache2
         state: absent
+        recurse: yes
 
     - name: Remove Apache2 logs
       file:
         path: /var/log/apache2
         state: absent
+        recurse: yes
 
     - name: Remove Apache2 HTML files
       file:
         path: /var/www/html
         state: absent
+        recurse: yes
 
     - name: Remove Apache2 systemd service files
       file:
@@ -44,4 +47,5 @@
       file:
         path: /usr/lib/apache2
         state: absent
+        recurse: yes
       when: ansible_os_family == "Debian"
