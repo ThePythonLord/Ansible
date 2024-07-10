@@ -1,33 +1,46 @@
 ---
-- name: Remove Apache from all nodes
-  hosts: all
+- name: Uninstall Apache2 from Ubuntu
+  hosts: your_host_group
   become: yes
-  become_user: root
   tasks:
-    - name: Stop Apache service
+    - name: Stop Apache2 service
       service:
         name: apache2
         state: stopped
+
+    - name: Disable Apache2 service
+      service:
+        name: apache2
         enabled: no
 
-    - name: Remove Apache packages
+    - name: Remove Apache2 package
       apt:
-        name: "{{ item }}"
+        name: apache2
         state: absent
-      loop:
-        - apache2
-        - apache2-utils
-        - apache2-bin
-        - apache2-data
+        purge: yes
 
-    - name: Ensure Apache configuration directory is absent
+    - name: Remove remaining Apache2 configuration files
       file:
         path: /etc/apache2
         state: absent
-      notify: restart nginx
 
-  handlers:
-    - name: restart nginx
-      systemd:
-        name: nginx
-        state: restarted
+    - name: Remove Apache2 logs
+      file:
+        path: /var/log/apache2
+        state: absent
+
+    - name: Remove Apache2 HTML files
+      file:
+        path: /var/www/html
+        state: absent
+
+    - name: Remove Apache2 systemd service files
+      file:
+        path: /lib/systemd/system/apache2.service
+        state: absent
+
+    - name: Remove other potential Apache2 directories
+      file:
+        path: /usr/lib/apache2
+        state: absent
+      when: ansible_os_family == "Debian"
