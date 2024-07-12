@@ -1,0 +1,3 @@
+hivemq_version: 4.9.5
+hivemq_bind_address: 0.0.0.0
+hivemq_port: 1883

@@ -1,0 +1,84 @@
+---
+- name: Ensure Java is installed
+  apt:
+    name: default-jre
+    state: present
+
+- name: Ensure unzip is installed
+  apt:
+    name: unzip
+    state: present
+
+- name: Create HiveMQ user and group
+  ansible.builtin.group:
+    name: hivemq
+    state: present
+
+- ansible.builtin.user:
+    name: hivemq
+    group: hivemq
+    home: /home/hivemq
+    create_home: yes
+    shell: /bin/bash
+
+- name: Download HiveMQ
+  ansible.builtin.get_url:
+    url: "https://www.hivemq.com/releases/hivemq-{{ hivemq_version }}.zip"
+    dest: /tmp/hivemq-{{ hivemq_version }}.zip
+
+- name: Unzip HiveMQ
+  ansible.builtin.unarchive:
+    src: /tmp/hivemq-{{ hivemq_version }}.zip
+    dest: /opt/
+    remote_src: yes
+
+- name: Rename HiveMQ directory
+  ansible.builtin.command:
+    cmd: mv /opt/hivemq-{{ hivemq_version }} /opt/hivemq
+    creates: /opt/hivemq
+
+- name: Set ownership for HiveMQ directory
+  ansible.builtin.file:
+    path: /opt/hivemq
+    owner: hivemq
+    group: hivemq
+    recurse: yes
+
+- name: Copy HiveMQ license file
+  ansible.builtin.copy:
+    src: files/hivemq.lic
+    dest: /opt/hivemq/license/hivemq.lic
+    owner: hivemq
+    group: hivemq
+    mode: '0644'
+
+- name: Configure HiveMQ
+  ansible.builtin.template:
+    src: config.xml.j2
+    dest: /opt/hivemq/conf/config.xml
+    owner: hivemq
+    group: hivemq
+
+- name: Create HiveMQ systemd service
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/hivemq.service
+    content: |
+      [Unit]
+      Description=HiveMQ service
+      After=network.target
+
+      [Service]
+      Type=simple
+      User=hivemq
+      Group=hivemq
+      ExecStart=/opt/hivemq/bin/run.sh
+      Restart=on-failure
+
+      [Install]
+      WantedBy=multi-user.target
+
+- name: Enable and start HiveMQ service
+  ansible.builtin.systemd:
+    name: hivemq
+    enabled: yes
+    state: started

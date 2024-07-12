@@ -1,0 +1,38 @@
+---
+- name: Uninstall HiveMQ
+  hosts: all
+  become: yes
+
+  tasks:
+    - name: Stop HiveMQ service if running
+      ansible.builtin.systemd:
+        name: hivemq
+        state: stopped
+        enabled: no
+
+    - name: Remove HiveMQ service file
+      ansible.builtin.file:
+        path: /etc/systemd/system/hivemq.service
+        state: absent
+
+    - name: Remove HiveMQ installation directory
+      ansible.builtin.file:
+        path: /opt/hivemq
+        state: absent
+
+    - name: Remove HiveMQ user and group
+      ansible.builtin.user:
+        name: hivemq
+        state: absent
+
+    - name: Clean up other HiveMQ related files and directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      with_items:
+        - /etc/default/hivemq
+        - /etc/sysconfig/hivemq
+        - /tmp/hivemq-*.zip
+        - /opt/hivemq/license/hivemq.lic
+        - /var/log/hivemq
+        - /opt/hive*
